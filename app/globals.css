@@ -189,3 +189,76 @@ form.claim button {
   font-size: 15px;
   cursor: pointer;
 }
+/* ---- Futuristic night theme ---- */
+body {
+  min-height: 100vh;
+  background:
+    radial-gradient(ellipse at 50% 100%, rgba(120, 60, 255, 0.35), transparent 60%),
+    linear-gradient(180deg, #05050f 0%, #0d0b24 55%, #1a1040 100%);
+  background-attachment: fixed;
+}
+
+/* keep page content above the stars and grid */
+.wrap {
+  position: relative;
+  z-index: 1;
+}
+
+/* stars */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.7;
+  background-image:
+    radial-gradient(1px 1px at 20px 30px, #fff, transparent),
+    radial-gradient(1px 1px at 90px 120px, #cde, transparent),
+    radial-gradient(2px 2px at 160px 60px, #fff, transparent),
+    radial-gradient(1px 1px at 230px 180px, #bcd, transparent),
+    radial-gradient(1px 1px at 300px 90px, #fff, transparent);
+  background-size: 340px 220px;
+}
+
+/* neon grid floor */
+body::after {
+  content: "";
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 40vh;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    linear-gradient(rgba(0, 255, 255, 0.25) 1px, transparent 1px) 0 0 / 40px 40px,
+    linear-gradient(90deg, rgba(0, 255, 255, 0.25) 1px, transparent 1px) 0 0 / 40px 40px;
+  transform: perspective(300px) rotateX(60deg);
+  transform-origin: bottom;
+  -webkit-mask-image: linear-gradient(to top, black, transparent);
+  mask-image: linear-gradient(to top, black, transparent);
+}
+
+/* give the glow room so it isn't clipped */
+.skyline {
+  height: 350px;
+  padding-top: 24px;
+}
+
+/* glowing plots */
+.building {
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 0, 0, 0.25),
+    0 0 18px rgba(0, 255, 255, 0.35);
+}
+
+.building.available {
+  border-color: rgba(0, 255, 255, 0.5);
+}
+
+/* neon street line */
+.ground {
+  background: #7df9ff;
+  box-shadow: 0 0 16px rgba(0, 255, 255, 0.7);
+}
