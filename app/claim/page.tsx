@@ -25,7 +25,7 @@ export default function ClaimPage() {
     const data = await res.json();
     if (!res.ok) {
       setStatus("error");
-      setMessage(data.error ?? "Something went wrong.");
+      setMessage(`${data.error ?? "Something went wrong."} ${data.detail ?? ""}`);
       return;
     }
     // Send the buyer to PayMongo's hosted checkout page.
