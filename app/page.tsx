@@ -38,36 +38,65 @@ export default async function HomePage() {
         <div><b>{(plots?.length ?? 0) - claimed.length}</b>plots open</div>
       </div>
 
-      <div className="skyline">
-        {(plots ?? []).map((p) => {
-          const height = TIER_HEIGHT[p.tier] ?? 120;
-          if (p.status === "claimed") {
+      <div className="city">
+        {/* flying cars in the sky */}
+        <div className="cars" aria-hidden="true">
+          <span className="car c1" />
+          <span className="car c2 rev" />
+          <span className="car c3" />
+          <span className="car c4 rev" />
+        </div>
+
+        {/* buildings */}
+        <div className="skyline">
+          {(plots ?? []).map((p) => {
+            const height = TIER_HEIGHT[p.tier] ?? 120;
+            if (p.status === "claimed") {
+              return (
+                
+                  key={p.id}
+                  href={p.website_url ?? "#"}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="building claimed"
+                  style={{ height, backgroundColor: p.color }}
+                >
+                  <span className="sign">{p.owner_name}</span>
+                </a>
+              );
+            }
             return (
-              <a
+              <Link
                 key={p.id}
-                href={p.website_url ?? "#"}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="building"
-                style={{ height, background: p.color }}
+                href={`/claim?slot=${p.slot_index}`}
+                className="building available"
+                style={{ height: Math.max(70, height * 0.55) }}
               >
-                <span className="sign">{p.owner_name}</span>
-              </a>
+                <span className="price">${(p.price_cents / 100).toFixed(0)}</span>
+              </Link>
             );
-          }
-          return (
-            <Link
-              key={p.id}
-              href={`/claim?slot=${p.slot_index}`}
-              className="building available"
-              style={{ height: Math.max(70, height * 0.55) }}
-            >
-              <span className="price">${(p.price_cents / 100).toFixed(0)}</span>
-            </Link>
-          );
-        })}
+          })}
+        </div>
+
+        {/* sidewalk, street, park */}
+        <div className="sidewalk" />
+        <div className="street" aria-hidden="true">
+          <span className="car g1" />
+          <span className="car g2 rev" />
+          <div className="lane" />
+        </div>
+        <div className="park" aria-hidden="true">
+          <span className="tree" />
+          <span className="tree" />
+          <span className="lamp" />
+          <span className="tree" />
+          <span className="tree" />
+          <span className="tree" />
+          <span className="lamp" />
+          <span className="tree" />
+          <span className="tree" />
+        </div>
       </div>
-      <div className="ground" />
 
       <Link href="/claim" className="cta">Claim a plot from $5</Link>
 
