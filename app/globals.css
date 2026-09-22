@@ -1,0 +1,685 @@
+/* ---- Design tokens ---- */
+:root {
+  --ink: #15151a;
+  --paper: #ece7de;
+  --marquee: #f2c230;
+  --brick: #c6402f;
+  --line: rgba(236, 231, 222, 0.14);
+  --muted: rgba(236, 231, 222, 0.6);
+  --font-display: "Georgia", "Iowan Old Style", serif;
+  --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: inherit; }
+
+.wrap {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 24px 20px 64px;
+}
+
+.masthead {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 18px;
+  margin-bottom: 28px;
+}
+
+.masthead h1 {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0;
+  letter-spacing: 0.2px;
+}
+
+.masthead .tagline {
+  color: var(--muted);
+  font-size: 14px;
+  max-width: 220px;
+  text-align: right;
+}
+
+.skyline {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  height: 320px;
+  padding: 0 4px 0;
+  border-bottom: 2px solid var(--paper);
+  overflow-x: auto;
+}
+
+.building {
+  position: relative;
+  flex: 1 0 64px;
+  min-width: 64px;
+  max-width: 120px;
+  border-radius: 3px 3px 0 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  padding-bottom: 10px;
+  text-decoration: none;
+  transition: transform 0.15s ease;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.25);
+}
+
+.building:hover { transform: translateY(-4px); }
+
+.building .sign {
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 6px;
+  border-radius: 2px;
+  max-width: 88%;
+  text-align: center;
+  line-height: 1.2;
+  word-break: break-word;
+}
+
+.building.available {
+  background: repeating-linear-gradient(
+    135deg,
+    rgba(236,231,222,0.06),
+    rgba(236,231,222,0.06) 6px,
+    transparent 6px,
+    transparent 12px
+  );
+  border: 1px dashed var(--line);
+}
+
+.building.available .price {
+  color: var(--marquee);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.ground {
+  height: 14px;
+  background: var(--paper);
+  margin-bottom: 36px;
+}
+
+.stats {
+  display: flex;
+  gap: 28px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.stats b { color: var(--paper); font-size: 18px; display: block; }
+
+.feed {
+  border-top: 1px solid var(--line);
+  margin-top: 8px;
+}
+
+.feed-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 14px;
+}
+
+.feed-row .name { font-weight: 600; }
+.feed-row .price { color: var(--marquee); font-weight: 700; }
+
+.cta {
+  display: inline-block;
+  background: var(--brick);
+  color: var(--paper);
+  padding: 12px 20px;
+  border-radius: 3px;
+  font-weight: 700;
+  font-size: 15px;
+  text-decoration: none;
+  margin-top: 6px;
+}
+
+form.claim {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 420px;
+}
+
+form.claim label {
+  font-size: 13px;
+  color: var(--muted);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+form.claim input, form.claim select {
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--paper);
+  padding: 10px 12px;
+  border-radius: 3px;
+  font-size: 15px;
+  font-family: var(--font-body);
+}
+
+form.claim button {
+  background: var(--marquee);
+  color: var(--ink);
+  border: none;
+  padding: 12px;
+  border-radius: 3px;
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+/* ================================================================
+   Digital tech theme (brushed metal + cyan/gold circuitry)
+   ================================================================ */
+body {
+  min-height: 100vh;
+  color: #dfeffa;
+  background:
+    linear-gradient(120deg, transparent 40%, rgba(255,255,255,0.05) 50%, transparent 60%),
+    repeating-linear-gradient(135deg, rgba(255,255,255,0.02) 0 2px, transparent 2px 6px),
+    linear-gradient(160deg, #0c0f14 0%, #12161d 45%, #171c25 100%);
+  background-attachment: fixed;
+}
+
+.wrap {
+  position: relative;
+  z-index: 1;
+}
+
+/* faint circuit-board grid */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.35;
+  background-image:
+    linear-gradient(rgba(77, 217, 255, 0.14) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(77, 217, 255, 0.14) 1px, transparent 1px);
+  background-size: 46px 46px;
+  -webkit-mask-image: radial-gradient(ellipse at 50% 25%, black 40%, transparent 80%);
+  mask-image: radial-gradient(ellipse at 50% 25%, black 40%, transparent 80%);
+}
+
+.masthead h1 {
+  text-shadow: 0 0 14px rgba(77, 217, 255, 0.35);
+}
+
+/* ================================================================
+   Buildings
+   ================================================================ */
+.city {
+  position: relative;
+  padding-top: 90px;
+}
+
+.skyline {
+  height: 300px;
+  padding: 90px 4px 0;
+  border-bottom: none;
+}
+
+.building {
+  border-radius: 4px;
+  box-shadow:
+    inset 0 0 0 1px rgba(77, 217, 255, 0.35),
+    0 0 14px rgba(77, 217, 255, 0.25);
+}
+
+.building::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  border-radius: 4px 4px 0 0;
+  background: linear-gradient(90deg, #4dd9ff, #f2c230);
+}
+
+/* buyer logo badge floating above the building */
+.building .logo {
+  position: absolute;
+  top: -52px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #0d1117;
+  border: 2px solid rgba(77, 217, 255, 0.85);
+  box-shadow:
+    0 0 10px rgba(77, 217, 255, 0.6),
+    0 2px 6px rgba(0, 0, 0, 0.5);
+}
+
+.building .sign {
+  background: #0d1117;
+  color: #dfeffa;
+  border: 1px solid rgba(77, 217, 255, 0.5);
+  box-shadow: 0 0 8px rgba(77, 217, 255, 0.35);
+}
+
+.building.claimed {
+  background-image: repeating-linear-gradient(
+    45deg,
+    rgba(255, 255, 255, 0.05) 0 2px,
+    transparent 2px 10px
+  );
+}
+
+.building.available {
+  background: repeating-linear-gradient(
+    135deg,
+    rgba(77, 217, 255, 0.08) 0 6px,
+    rgba(77, 217, 255, 0.02) 6px 12px
+  );
+  border: 1px dashed rgba(77, 217, 255, 0.45);
+}
+
+.building.available .price {
+  color: #f2c230;
+  text-shadow: 0 0 8px rgba(242, 194, 48, 0.55);
+}
+
+/* ================================================================
+   Skyline variety — uneven widths and heights, clustered like a
+   real downtown instead of one perfectly even row
+   ================================================================ */
+.skyline .building:nth-child(3n+1) {
+  flex-basis: 58px;
+  min-width: 58px;
+  max-width: 76px;
+}
+
+.skyline .building:nth-child(3n+2) {
+  flex-basis: 98px;
+  min-width: 74px;
+  max-width: 112px;
+}
+
+.skyline .building:nth-child(3n) {
+  flex-basis: 76px;
+  min-width: 64px;
+  max-width: 96px;
+}
+
+/* stagger the baseline so buildings sit at slightly different
+   ground levels, like blocks on rolling terrain */
+.skyline .building:nth-child(2n) { margin-bottom: 14px; }
+.skyline .building:nth-child(5n) { margin-bottom: 26px; }
+.skyline .building:nth-child(7n) { margin-bottom: 6px; }
+.skyline .building:nth-child(4n+1) { margin-bottom: 20px; }
+
+/* wider gaps every so often, like streets breaking up city blocks */
+.skyline .building:nth-child(6n) { margin-right: 30px; }
+.skyline .building:nth-child(11n) { margin-right: 38px; }
+.skyline .building:nth-child(17n) { margin-right: 26px; }
+
+/* ---- sky: a small plane towing a banner ---- */
+.cars {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 60px;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.cars .car {
+  display: none;
+}
+
+.cars .c1 {
+  display: block;
+  position: absolute;
+  top: 18px;
+  width: 54px;
+  height: 16px;
+  border-radius: 40% 12% 12% 40%;
+  background: #e9edf2;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
+  animation: fly 24s linear infinite;
+}
+
+.cars .c1::before {
+  content: "";
+  position: absolute;
+  right: -2px;
+  top: -7px;
+  width: 0;
+  height: 0;
+  border-left: 7px solid transparent;
+  border-bottom: 9px solid #e9edf2;
+}
+
+.cars .c1::after {
+  content: "PLOT AVENUE";
+  position: absolute;
+  right: 100%;
+  top: -3px;
+  margin-right: 10px;
+  white-space: nowrap;
+  background: #f2c230;
+  color: #141821;
+  font: 700 11px/1.4 var(--font-body);
+  letter-spacing: 0.5px;
+  padding: 3px 10px;
+  border-radius: 3px;
+  box-shadow: 0 0 10px rgba(242, 194, 48, 0.6);
+}
+
+/* ---- ground: a real road with cars driving across ---- */
+.sidewalk {
+  height: 4px;
+  background: linear-gradient(90deg, #4dd9ff, #f2c230);
+  box-shadow: 0 0 8px rgba(77, 217, 255, 0.5);
+}
+
+.street {
+  position: relative;
+  height: 64px;
+  overflow: hidden;
+  margin-bottom: 36px;
+  border-radius: 0 0 8px 8px;
+  background: linear-gradient(180deg, #2b2f36, #1b1e23);
+}
+
+.street::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 3px;
+  transform: translateY(-50%);
+  opacity: 0.9;
+  background: repeating-linear-gradient(90deg, #f2c230 0 22px, transparent 22px 44px);
+}
+
+.street .car {
+  display: block;
+  position: absolute;
+  top: 14px;
+  width: 42px;
+  height: 16px;
+  border-radius: 4px;
+  background: #4dd9ff;
+  box-shadow: 0 0 10px rgba(77, 217, 255, 0.6);
+  animation: driveAcross 9s linear infinite;
+}
+
+.street .car::before {
+  content: "";
+  position: absolute;
+  top: -6px;
+  left: 9px;
+  width: 18px;
+  height: 7px;
+  border-radius: 3px 3px 0 0;
+  background: rgba(255, 255, 255, 0.85);
+}
+
+.street .g1 {
+  animation-delay: -1s;
+}
+
+.street .g2 {
+  top: 40px;
+  background: #f2c230;
+  box-shadow: 0 0 10px rgba(242, 194, 48, 0.6);
+  animation-duration: 12s;
+  animation-delay: -4s;
+}
+
+/* park strip removed in favor of the road above */
+.park {
+  display: none;
+}
+
+@keyframes fly {
+  from { left: -180px; }
+  to   { left: 100%; }
+}
+
+@keyframes driveAcross {
+  from { left: -60px; }
+  to   { left: 100%; }
+}
+
+/* ================================================================
+   Isometric city scene (draggable + zoomable)
+   ================================================================ */
+.scene {
+  position: relative;
+  margin: 20px 0 36px;
+}
+
+.scene-controls {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  z-index: 5;
+  display: flex;
+  gap: 6px;
+}
+
+.scene-controls button {
+  width: 34px;
+  height: 34px;
+  border-radius: 6px;
+  border: 1px solid rgba(77, 217, 255, 0.5);
+  background: #0d1117;
+  color: #dfeffa;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 0 8px rgba(77, 217, 255, 0.35);
+}
+
+.scene-controls button:hover {
+  background: #141b24;
+}
+
+.scene-controls button.reset {
+  width: auto;
+  padding: 0 10px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+
+.scene-viewport {
+  position: relative;
+  height: 420px;
+  overflow: hidden;
+  border-radius: 10px;
+  border: 1px solid rgba(77, 217, 255, 0.25);
+  background:
+    radial-gradient(ellipse at 50% 30%, rgba(77, 217, 255, 0.08), transparent 70%),
+    #0b0e13;
+  cursor: grab;
+  touch-action: none;
+}
+
+.scene-viewport:active {
+  cursor: grabbing;
+}
+
+.scene-world {
+  position: absolute;
+  left: 50%;
+  top: 60px;
+  width: 0;
+  height: 0;
+  transform-origin: 0 0;
+}
+
+.tile {
+  position: absolute;
+  transform: translate(-50%, -100%);
+}
+
+.tile.road {
+  width: 96px;
+  height: 48px;
+  transform: translate(-50%, -50%);
+  background: linear-gradient(135deg, #2b2f36, #1b1e23);
+  clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+}
+
+.tile.road::after {
+  content: "";
+  position: absolute;
+  inset: 20% 8%;
+  clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+  background: repeating-linear-gradient(90deg, rgba(242, 194, 48, 0.7) 0 8px, transparent 8px 16px);
+  opacity: 0.6;
+}
+
+.tile.tree {
+  width: 40px;
+  height: 40px;
+  transform: translate(-50%, -80%);
+}
+
+.tile.tree::before {
+  content: "";
+  position: absolute;
+  left: 17px;
+  bottom: 0;
+  width: 5px;
+  height: 12px;
+  background: #8a5a2b;
+}
+
+.tile.tree::after {
+  content: "";
+  position: absolute;
+  left: 4px;
+  bottom: 8px;
+  width: 30px;
+  height: 26px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #4be08a, #1f8f52 70%);
+  box-shadow: 0 0 8px rgba(77, 217, 255, 0.25);
+}
+
+.plot-link {
+  display: block;
+  position: relative;
+  text-decoration: none;
+}
+
+.cube-group {
+  position: relative;
+  transform-origin: 50% 100%;
+}
+
+.cube {
+  --wall: #2f6f8c;
+  position: relative;
+  width: 64px;
+  height: 64px;
+}
+
+.cube .face {
+  position: absolute;
+  width: 64px;
+  height: 64px;
+  background: var(--wall);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2);
+}
+
+.cube .top {
+  top: -46px;
+  left: 0;
+  transform: rotate(210deg) skew(-30deg) scaleY(0.864);
+  filter: brightness(1.3);
+}
+
+.cube .left {
+  left: -43px;
+  top: 26px;
+  transform: rotate(90deg) skew(-30deg) scaleY(0.864);
+  filter: brightness(0.55);
+}
+
+.cube .right {
+  left: 21px;
+  top: 10px;
+  transform: skew(0deg, 30deg);
+  filter: brightness(0.85);
+}
+
+.plot.available .cube {
+  --wall: #163244;
+}
+
+.plot.available .cube .top {
+  background: repeating-linear-gradient(
+    135deg,
+    rgba(77, 217, 255, 0.22) 0 6px,
+    rgba(77, 217, 255, 0.06) 6px 12px
+  );
+}
+
+.plot-logo {
+  position: absolute;
+  left: 50%;
+  top: -96px;
+  transform: translateX(-50%);
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #0d1117;
+  border: 2px solid rgba(77, 217, 255, 0.85);
+  box-shadow: 0 0 8px rgba(77, 217, 255, 0.6);
+}
+
+.plot-sign,
+.plot-price {
+  position: absolute;
+  left: 50%;
+  top: -70px;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 6px;
+  border-radius: 3px;
+  background: #0d1117;
+  color: #dfeffa;
+  border: 1px solid rgba(77, 217, 255, 0.5);
+}
+
+.plot-price {
+  color: #f2c230;
+}
