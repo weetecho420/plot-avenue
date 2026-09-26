@@ -44,7 +44,6 @@ export async function POST(req: Request) {
 
   const session = event.data.attributes.data;
   const plotId = session.attributes.reference_number;
-  const paidAmount = session.attributes.payments?.[0]?.attributes?.amount ?? 0;
 
   const supabase = supabaseAdmin();
 
@@ -53,7 +52,7 @@ export async function POST(req: Request) {
     .update({ status: "claimed", claimed_at: new Date().toISOString() })
     .eq("id", plotId)
     .eq("status", "pending")
-    .select("owner_name")
+    .select("owner_name, price_cents")
     .maybeSingle();
 
   if (error) {
@@ -64,7 +63,9 @@ export async function POST(req: Request) {
     await supabase.from("sales_log").insert({
       plot_id: plotId,
       owner_name: plot.owner_name,
-      price_cents: paidAmount,
+      // Log the plot's USD price (the customer paid the peso equivalent),
+      // so the sales feed and totals stay in dollars.
+      price_cents: plot.price_cents,
     });
   }
 

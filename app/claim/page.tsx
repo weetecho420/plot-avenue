@@ -68,7 +68,7 @@ export default function ClaimPage() {
             <input name="logo_url" type="url" placeholder="https://" />
           </label>
           <button type="submit" name="pay" value="paymongo" disabled={status === "submitting"}>
-            {status === "submitting" ? "Reserving..." : "Pay with GCash / card"}
+            {status === "submitting" ? "Reserving..." : "Pay with GCash / card (charged in ₱)"}
           </button>
           <button type="submit" name="pay" value="crypto" className="crypto" disabled={status === "submitting"}>
             Pay with crypto (BTC · ETH · SOL · USDT · USDC)

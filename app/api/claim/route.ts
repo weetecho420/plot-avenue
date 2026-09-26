@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
+import { usdCentsToPhpCentavos } from "@/lib/fx";
 
 const TIER_LABEL: Record<string, string> = {
   kiosk: "Kiosk plot",
@@ -47,6 +48,8 @@ export async function POST(req: Request) {
   // Create the PayMongo Checkout Session. reference_number carries the
   // plot id through to the webhook so we know what to mark "claimed".
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+  // Plot prices are in US cents; PayMongo charges pesos, so convert.
+  const amountPhpCentavos = await usdCentsToPhpCentavos(candidate.price_cents);
   const checkoutRes = await fetch("https://api.paymongo.com/v2/checkout_sessions", {
     method: "POST",
     headers: {
@@ -60,7 +63,7 @@ export async function POST(req: Request) {
           line_items: [
             {
               name: TIER_LABEL[tier] ?? "Plot",
-              amount: candidate.price_cents,
+              amount: amountPhpCentavos,
               currency: "PHP",
               quantity: 1,
             },
