@@ -535,3 +535,13 @@ body::before {
   from { left: -260px; }
   to { left: 110%; }
 }
+
+/* Crypto payment button: outlined so it sits under the main PayMongo button */
+form.claim button.crypto {
+  background: transparent;
+  color: #f5c542;
+  border: 1px solid #f5c542;
+}
+form.claim button.crypto:hover {
+  background: rgba(245, 197, 66, 0.12);
+}

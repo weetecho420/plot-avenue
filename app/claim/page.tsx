@@ -10,8 +10,11 @@ export default function ClaimPage() {
     e.preventDefault();
     setStatus("submitting");
     const form = new FormData(e.currentTarget);
+    // Which button was pressed: PayMongo (GCash/card) or crypto.
+    const submitter = (e.nativeEvent as SubmitEvent).submitter as HTMLButtonElement | null;
+    const endpoint = submitter?.value === "crypto" ? "/api/crypto-checkout" : "/api/claim";
 
-    const res = await fetch("/api/claim", {
+    const res = await fetch(endpoint, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -49,6 +52,7 @@ export default function ClaimPage() {
               <option value="kiosk">Kiosk — $5</option>
               <option value="shop">Shop front — $25</option>
               <option value="tower">Tower — $75</option>
+              <option value="skyscraper">Skyscraper — $150</option>
             </select>
           </label>
           <label>
@@ -63,8 +67,11 @@ export default function ClaimPage() {
             Logo image URL
             <input name="logo_url" type="url" placeholder="https://" />
           </label>
-          <button type="submit" disabled={status === "submitting"}>
-            {status === "submitting" ? "Reserving..." : "Reserve this plot"}
+          <button type="submit" name="pay" value="paymongo" disabled={status === "submitting"}>
+            {status === "submitting" ? "Reserving..." : "Pay with GCash / card"}
+          </button>
+          <button type="submit" name="pay" value="crypto" className="crypto" disabled={status === "submitting"}>
+            Pay with crypto (BTC · ETH · SOL · USDT · USDC)
           </button>
           {status === "error" && <p style={{ color: "#c6402f" }}>{message}</p>}
         </form>

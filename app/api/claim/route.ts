@@ -5,6 +5,7 @@ const TIER_LABEL: Record<string, string> = {
   kiosk: "Kiosk plot",
   shop: "Shop front plot",
   tower: "Tower plot",
+  skyscraper: "Skyscraper plot",
 };
 
 export async function POST(req: Request) {
@@ -22,6 +23,8 @@ export async function POST(req: Request) {
     .select("id, price_cents")
     .eq("tier", tier)
     .eq("status", "available")
+    // Skip plots someone is currently paying for with crypto.
+    .or(`reserved_until.is.null,reserved_until.lt.${new Date().toISOString()}`)
     .order("slot_index", { ascending: true })
     .limit(1)
     .maybeSingle();
