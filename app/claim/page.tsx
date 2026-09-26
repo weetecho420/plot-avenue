@@ -1,10 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useRef, useState } from "react";
+import PayPalButton from "./PayPalButton";
 
 export default function ClaimPage() {
   const [status, setStatus] = useState<"idle" | "submitting" | "done" | "error">("idle");
   const [message, setMessage] = useState("");
+  const formRef = useRef<HTMLFormElement>(null);
+  const getForm = useCallback(() => formRef.current, []);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -45,7 +48,7 @@ export default function ClaimPage() {
       {status === "done" ? (
         <p>Redirecting to payment...</p>
       ) : (
-        <form className="claim" onSubmit={handleSubmit}>
+        <form className="claim" onSubmit={handleSubmit} ref={formRef}>
           <label>
             Plot size
             <select name="tier" required>
@@ -74,6 +77,7 @@ export default function ClaimPage() {
             Pay with crypto (BTC · ETH · SOL · USDT · USDC)
           </button>
           {status === "error" && <p style={{ color: "#c6402f" }}>{message}</p>}
+          <PayPalButton getForm={getForm} />
         </form>
       )}
     </main>
