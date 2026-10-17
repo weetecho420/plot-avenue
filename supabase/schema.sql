@@ -15,6 +15,7 @@ create table if not exists plots (
   logo_url text,
   color text default '#5B6B73',
   reserved_until timestamptz,                -- checkout hold; expires on its own
+  nft_asset text,                            -- Solana NFT address (Phantom buyers only)
   claimed_at timestamptz,
   created_at timestamptz not null default now()
 );
@@ -49,7 +50,7 @@ drop policy if exists "public read sales log" on sales_log;
 create policy "public read sales log" on sales_log for select using (true);
 
 -- ───────────────────────── order tables ─────────────────────────
--- One per payment method. All private (RLS on, no policies).
+-- One per payment method (PayMongo, PayPal, NOWPayments crypto, Phantom/Solana). All private (RLS on, no policies).
 -- status: 'pending' | 'paid' | 'failed' | 'needs_refund' | 'refunded' | ...
 
 create table if not exists paymongo_orders (
@@ -100,6 +101,29 @@ create table if not exists crypto_orders (
   created_at timestamptz not null default now()
 );
 alter table crypto_orders enable row level security;
+
+create table if not exists solana_orders (
+  id uuid primary key default gen_random_uuid(),
+  plot_id uuid not null references plots(id),
+  owner_name text not null,
+  website_url text not null,
+  logo_url text,
+  price_cents int not null,                  -- USD cents
+  buyer_wallet text not null,                -- Phantom address that must pay (and gets the NFT)
+  reference text not null unique,            -- unique key attached to the payment tx
+  lamports bigint not null,                  -- SOL amount locked in at order time
+  sol_usd numeric not null,                  -- SOL price used for the quote
+  cluster text not null,                     -- 'devnet' | 'mainnet-beta'
+  status text not null default 'pending',
+  tx_signature text unique,
+  nft_status text not null default 'none',   -- 'none' | 'minting' | 'minted' | 'failed'
+  nft_asset text,
+  nft_error text,
+  nft_started_at timestamptz,
+  paid_at timestamptz,
+  created_at timestamptz not null default now()
+);
+alter table solana_orders enable row level security;
 
 -- ───────────────────────── completion functions ─────────────────────────
 -- Each one claims the plot + logs the sale in a single transaction.
@@ -166,7 +190,41 @@ begin
   return 'ok';
 end $$;
 
+create or replace function complete_solana_order(p_order_id uuid, p_signature text)
+returns text language plpgsql security definer set search_path to 'public' as $$
+declare o solana_orders%rowtype; claimed int;
+begin
+  select * into o from solana_orders where id = p_order_id for update;
+  if not found then raise exception 'order not found'; end if;
+  if o.status = 'paid' then return 'ok'; end if;
+  update plots set status='claimed', owner_name=o.owner_name, website_url=o.website_url,
+         logo_url=o.logo_url, claimed_at=now(), reserved_until=null
+   where id=o.plot_id and status='available';
+  get diagnostics claimed = row_count;
+  if claimed = 0 then
+    update solana_orders set status='needs_refund', tx_signature=p_signature where id=o.id;
+    return 'plot_taken';
+  end if;
+  insert into sales_log (plot_id, owner_name, price_cents) values (o.plot_id, o.owner_name, o.price_cents);
+  update solana_orders set status='paid', tx_signature=p_signature, paid_at=now() where id=o.id;
+  return 'ok';
+end $$;
+
+-- Only one request at a time may mint an order's NFT. Returns true if this caller won the job.
+create or replace function start_solana_nft_mint(p_order_id uuid)
+returns boolean language plpgsql security definer set search_path to 'public' as $$
+declare n int;
+begin
+  update solana_orders set nft_status='minting', nft_started_at=now(), nft_error=null
+   where id=p_order_id and status='paid'
+     and (nft_status in ('none','failed') or (nft_status='minting' and nft_started_at < now() - interval '5 minutes'));
+  get diagnostics n = row_count;
+  return n = 1;
+end $$;
+
 -- Only the server (service role) may run these.
 revoke execute on function complete_paymongo_order(uuid, text, text) from public, anon, authenticated;
 revoke execute on function complete_paypal_order(uuid, text, text) from public, anon, authenticated;
 revoke execute on function complete_crypto_order(uuid, text, text, numeric) from public, anon, authenticated;
+revoke execute on function complete_solana_order(uuid, text) from public, anon, authenticated;
+revoke execute on function start_solana_nft_mint(uuid) from public, anon, authenticated;

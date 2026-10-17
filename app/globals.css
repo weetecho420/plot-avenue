@@ -549,3 +549,18 @@ form.claim button.crypto:hover {
 /* PayPal button area (only shown when PayPal keys are set) */
 .paypal-box { margin-top: 4px; }
 .paypal-or { font-size: 12px; color: var(--muted); text-align: center; margin: 4px 0 8px; }
+
+/* Phantom (SOL) button: Phantom purple, outlined like the crypto button */
+.phantom-box { display: flex; flex-direction: column; gap: 6px; }
+form.claim button.phantom {
+  background: transparent;
+  color: #ab9ff2;
+  border: 1px solid #ab9ff2;
+}
+form.claim button.phantom:hover { background: rgba(171, 159, 242, 0.12); }
+form.claim button.phantom:disabled { opacity: 0.6; cursor: wait; }
+.phantom-note { font-size: 12px; color: var(--muted); margin: 0; text-align: center; }
+.phantom-msg { font-size: 14px; margin: 0; color: #dfeffa; }
+.phantom-msg.error { color: #e0604f; }
+.nft-proof { margin: 12px 0 20px; }
+.nft-proof a { color: #ab9ff2; }

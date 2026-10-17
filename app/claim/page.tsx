@@ -2,6 +2,7 @@
 
 import { useCallback, useRef, useState } from "react";
 import PayPalButton from "./PayPalButton";
+import PhantomButton from "./PhantomButton";
 
 export default function ClaimPage() {
   const [status, setStatus] = useState<"idle" | "submitting" | "done" | "error">("idle");
@@ -76,6 +77,7 @@ export default function ClaimPage() {
           <button type="submit" name="pay" value="crypto" className="crypto" disabled={status === "submitting"}>
             Pay with crypto (BTC · ETH · SOL · USDT · USDC)
           </button>
+          <PhantomButton getForm={getForm} />
           {status === "error" && <p style={{ color: "#c6402f" }}>{message}</p>}
           <PayPalButton getForm={getForm} />
         </form>
