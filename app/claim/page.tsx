@@ -14,6 +14,8 @@ const TIER_NAME: Record<string, string> = {
 
 type Chosen = { slot: number; tier: string; price_cents: number };
 
+const TIER_PRICE_CENTS: Record<string, number> = { kiosk: 500, shop: 2500, tower: 7500, skyscraper: 15000 };
+
 export default function ClaimPage() {
   const [status, setStatus] = useState<"idle" | "submitting" | "done" | "error">("idle");
   const [message, setMessage] = useState("");
@@ -22,6 +24,17 @@ export default function ClaimPage() {
   // The exact building tapped on the avenue (?slot=12), if it's still for sale.
   const [chosen, setChosen] = useState<Chosen | null>(null);
   const [slotNote, setSlotNote] = useState("");
+  // Selected size (when no exact plot was chosen) and the live peso rate,
+  // so the PayMongo button can show "$5 (≈ ₱316)".
+  const [tier, setTier] = useState("kiosk");
+  const [phpRate, setPhpRate] = useState<number | null>(null);
+
+  useEffect(() => {
+    fetch("/api/fx")
+      .then((r) => r.json())
+      .then((d) => setPhpRate(Number(d.phpPerUsd) || null))
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     const raw = new URLSearchParams(window.location.search).get("slot");
@@ -72,6 +85,11 @@ export default function ClaimPage() {
     window.location.href = data.checkoutUrl;
   }
 
+  // Same maths as the server (lib/fx.ts): round up to a whole peso.
+  const usdCents = chosen ? chosen.price_cents : TIER_PRICE_CENTS[tier] ?? 500;
+  const usd = `$${(usdCents / 100).toFixed(0)}`;
+  const pesoLabel = phpRate ? `${usd} (≈ ₱${Math.ceil((usdCents / 100) * phpRate).toLocaleString()})` : usd;
+
   return (
     <main className="wrap">
       <div className="masthead">
@@ -98,7 +116,7 @@ export default function ClaimPage() {
             <label>
               Plot size
               {slotNote && <span className="slot-note">{slotNote}</span>}
-              <select name="tier" required>
+              <select name="tier" required value={tier} onChange={(e) => setTier(e.target.value)}>
                 <option value="kiosk">Kiosk — $5</option>
                 <option value="shop">Shop front — $25</option>
                 <option value="tower">Tower — $75</option>
@@ -119,7 +137,7 @@ export default function ClaimPage() {
             <input name="logo_url" type="url" placeholder="https://" />
           </label>
           <button type="submit" name="pay" value="paymongo" disabled={status === "submitting"}>
-            {status === "submitting" ? "Reserving..." : "Pay with GCash / card (charged in ₱)"}
+            {status === "submitting" ? "Reserving..." : `Pay with GCash / QR Ph — ${pesoLabel}`}
           </button>
           <button type="submit" name="pay" value="crypto" className="crypto" disabled={status === "submitting"}>
             Pay with crypto (BTC · ETH · SOL · USDT · USDC)
