@@ -27,12 +27,15 @@ export default async function HomePage() {
       </div>
 
       <div className="stats">
+        <div><b>{claimed.length} of {plots?.length ?? 0}</b>buildings lit</div>
+        <div><b>{(plots?.length ?? 0) - claimed.length}</b>still dark, for sale</div>
         <div><b>${(totalCents / 100).toLocaleString()}</b>total sales</div>
-        <div><b>{claimed.length}</b>plots claimed</div>
-        <div><b>{(plots?.length ?? 0) - claimed.length}</b>plots open</div>
       </div>
 
       <CityScene plots={plots ?? []} />
+      <p className="av-legend">
+        Every sale switches a building on. Tap a dark one to claim that exact spot, or a lit one to visit its owner.
+      </p>
 
       <Link href="/claim" className="cta">Claim a plot from $5</Link>
 

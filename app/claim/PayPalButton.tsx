@@ -32,6 +32,7 @@ export default function PayPalButton({ getForm }: Props) {
         const f = form ? new FormData(form) : new FormData();
         return {
           tier: f.get("tier"),
+          slot: f.get("slot"),
           owner_name: f.get("owner_name"),
           website_url: f.get("website_url"),
           logo_url: f.get("logo_url"),

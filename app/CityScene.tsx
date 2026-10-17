@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import type { CSSProperties } from "react";
 
 type Plot = {
@@ -13,199 +13,106 @@ type Plot = {
   owner_name: string | null;
   website_url: string | null;
   logo_url: string | null;
-  color: string | null;
 };
 
-const TIER: Record<string, { size: number; height: number }> = {
-  kiosk: { size: 46, height: 70 },
-  shop: { size: 54, height: 105 },
-  tower: { size: 60, height: 145 },
-  skyscraper: { size: 68, height: 195 },
+// Building size per tier, and the neon colour of its rooftop billboard.
+const TIER: Record<string, { w: number; h: number; neon: string; name: string }> = {
+  kiosk: { w: 58, h: 92, neon: "#5BE7F2", name: "Kiosk" },
+  shop: { w: 74, h: 142, neon: "#FF6FB1", name: "Shop front" },
+  tower: { w: 86, h: 214, neon: "#FFB547", name: "Tower" },
+  skyscraper: { w: 98, h: 292, neon: "#B596FF", name: "Skyscraper" },
 };
 
-const AVAILABLE_COLOR = "#163244";
+const dollars = (cents: number) => `$${(cents / 100).toFixed(0)}`;
 
-function Building({
-  size,
-  height,
-  color,
-  href,
-  external,
-  label,
-  logoUrl,
-}: {
-  size: number;
-  height: number;
-  color: string;
-  href: string;
-  external: boolean;
-  label: string;
-  logoUrl?: string | null;
-}) {
-  const style: CSSProperties = {
-    width: size,
-    height,
-    backgroundColor: color,
-  };
+function Building({ p }: { p: Plot }) {
+  const t = TIER[p.tier] ?? TIER.shop;
+  const lit = p.status === "claimed";
+  const style = {
+    "--w": `${t.w}px`,
+    "--h": `${t.h}px`,
+    "--neon": t.neon,
+    // Small per-building shift so the windows don't line up like a grid.
+    "--win-shift": `${(p.slot_index * 7) % 13}px`,
+  } as CSSProperties;
 
-  const tag = logoUrl ? (
-    <img src={logoUrl} alt={label} className="plot-logo" />
-  ) : (
-    <span className={external ? "plot-sign" : "plot-price"}>{label}</span>
-  );
-
-  const inner = (
+  const body = (
     <>
-      <div className="tag">{tag}</div>
-      <div className="building" style={style} />
+      {lit ? (
+        <span className="av-billboard">
+          {p.logo_url ? <img src={p.logo_url} alt="" loading="lazy" /> : null}
+          <span className="av-billboard-name">{p.owner_name}</span>
+        </span>
+      ) : (
+        <span className="av-roof-gap" />
+      )}
+      <span className={`av-body tier-${p.tier}`}>
+        {!lit && <span className="av-price">{dollars(p.price_cents)}</span>}
+      </span>
     </>
   );
 
-  const linkProps = { className: "building-col", "aria-label": label };
-
-  if (external) {
+  if (lit) {
     return (
-      <a href={href} target="_blank" rel="noopener noreferrer" {...linkProps}>
-        {inner}
+      <a
+        href={p.website_url ?? "#"}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="av-building is-lit"
+        style={style}
+        aria-label={`${p.owner_name} — plot ${p.slot_index + 1}, visit their site`}
+        title={p.owner_name ?? undefined}
+      >
+        {body}
       </a>
     );
   }
 
   return (
-    <Link href={href} {...linkProps}>
-      {inner}
+    <Link
+      href={`/claim?slot=${p.slot_index}`}
+      className="av-building is-dark"
+      style={style}
+      aria-label={`Claim plot ${p.slot_index + 1}: ${t.name}, ${dollars(p.price_cents)}`}
+      title={`Claim plot #${p.slot_index + 1} · ${t.name} · ${dollars(p.price_cents)}`}
+    >
+      {body}
     </Link>
   );
 }
 
 export default function CityScene({ plots }: { plots: Plot[] }) {
-  const [zoom, setZoom] = useState(1);
-  const rowRef = useRef<HTMLDivElement | null>(null);
-  const sidewalkRef = useRef<HTMLDivElement | null>(null);
-  const roadRef = useRef<HTMLDivElement | null>(null);
-  const [streetWidth, setStreetWidth] = useState(0);
-
-  useEffect(() => {
-    function measure() {
-      if (rowRef.current) setStreetWidth(rowRef.current.getBoundingClientRect().width / zoom);
-    }
-    measure();
-    window.addEventListener("resize", measure);
-    return () => window.removeEventListener("resize", measure);
-  }, [plots, zoom]);
-
-  function zoomIn() {
-    setZoom((z) => Math.min(1.6, +(z + 0.15).toFixed(2)));
-  }
-
-  function zoomOut() {
-    setZoom((z) => Math.max(0.5, +(z - 0.15).toFixed(2)));
-  }
-
-  function resetView() {
-    setZoom(1);
-  }
+  const scroller = useRef<HTMLDivElement | null>(null);
+  const nudge = (dir: 1 | -1) => {
+    const el = scroller.current;
+    if (el) el.scrollBy({ left: dir * el.clientWidth * 0.7, behavior: "smooth" });
+  };
 
   return (
-    <div className="scene">
-      <div className="scene-controls">
-        <button type="button" onClick={zoomIn} aria-label="Zoom in">+</button>
-        <button type="button" onClick={zoomOut} aria-label="Zoom out">&minus;</button>
-        <button type="button" onClick={resetView} aria-label="Reset view" className="reset">Reset</button>
+    <div className="av-scene">
+      <div className="av-sky" aria-hidden="true">
+        <span className="av-moon" />
       </div>
 
-      <div className="scene-viewport">
-        <div className="plane-rig" aria-hidden="true">
-          <span className="banner">PLOT AVENUE</span>
-          <span className="tow-line" />
-          <svg className="plane-icon" viewBox="0 0 24 24" aria-hidden="true">
-            <path
-              fill="#eef2f6"
-              d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"
-            />
-          </svg>
-        </div>
-
-        <div className="stage" style={{ transform: `scale(${zoom})` }}>
-          <div className="building-row" ref={rowRef}>
-            {plots.map((p) => {
-              const dims = TIER[p.tier] ?? TIER.shop;
-              const claimed = p.status === "claimed";
-              const color = claimed ? p.color ?? "#2f6f8c" : AVAILABLE_COLOR;
-              const label = claimed ? p.owner_name ?? "Claimed" : `$${(p.price_cents / 100).toFixed(0)}`;
-              return (
-                <Building
-                  key={p.id}
-                  size={dims.size}
-                  height={dims.height}
-                  color={color}
-                  href={claimed ? p.website_url ?? "#" : `/claim?slot=${p.slot_index}`}
-                  external={claimed}
-                  label={label}
-                  logoUrl={claimed ? p.logo_url : null}
-                />
-              );
-            })}
+      <div className="av-scroller" ref={scroller}>
+        <div className="av-avenue">
+          <div className="av-backdrop" aria-hidden="true" />
+          <div className="av-row">
+            {plots.map((p) => (
+              <Building key={p.id} p={p} />
+            ))}
           </div>
-
-          <div className="street">
-            <div className="sidewalk" ref={sidewalkRef} style={{ width: streetWidth || "100%" }}>
-              <Pedestrian left={20} span={streetWidth * 0.5} duration={9} delay={0} />
-              <Pedestrian left={streetWidth * 0.55} span={streetWidth * 0.35} duration={8} delay={-1} />
-            </div>
-            <div className="road" ref={roadRef} style={{ width: streetWidth || "100%" }}>
-              <Car color="#4dd9ff" span={streetWidth - 30} duration={6} delay={0} top={6} />
-              <Car color="#f2c230" span={streetWidth - 30} duration={7} delay={-3} top={6} />
-            </div>
+          <div className="av-street" aria-hidden="true">
+            <span className="av-car av-car-east" />
+            <span className="av-car av-car-west" />
           </div>
         </div>
       </div>
-    </div>
-  );
-}
 
-function Car({ color, span, duration, delay, top }: { color: string; span: number; duration: number; delay: number; top: number }) {
-  return (
-    <div
-      className="car"
-      style={
-        {
-          top,
-          animationDuration: `${duration}s`,
-          animationDelay: `${delay}s`,
-          "--span": `${span}px`,
-        } as CSSProperties
-      }
-    >
-      <div className="body" style={{ background: color }} />
-      <div className="cabin" style={{ background: color }} />
-      <div className="wheel front" />
-      <div className="wheel back" />
-      <div className="light front" />
-      <div className="light back" />
-    </div>
-  );
-}
-
-function Pedestrian({ left, span, duration, delay }: { left: number; span: number; duration: number; delay: number }) {
-  return (
-    <div
-      className="ped"
-      style={
-        {
-          left,
-          animationDuration: `${duration}s`,
-          animationDelay: `${delay}s`,
-          "--span": `${span}px`,
-        } as CSSProperties
-      }
-    >
-      <div className="head" />
-      <div className="torso" />
-      <div className="arm l" />
-      <div className="arm r" />
-      <div className="leg l" />
-      <div className="leg r" />
+      <div className="av-nav">
+        <button type="button" onClick={() => nudge(-1)} aria-label="Scroll the avenue left">‹</button>
+        <button type="button" onClick={() => nudge(1)} aria-label="Scroll the avenue right">›</button>
+      </div>
     </div>
   );
 }

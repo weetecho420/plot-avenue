@@ -20,7 +20,14 @@ export function cleanUrl(v: unknown): string | null | undefined {
   }
 }
 
-export type ClaimInput = { tier: string; ownerName: string; websiteUrl: string; logoUrl: string | null };
+// slot = the exact plot the buyer tapped on the avenue (optional).
+export type ClaimInput = {
+  tier: string;
+  ownerName: string;
+  websiteUrl: string;
+  logoUrl: string | null;
+  slot: number | null;
+};
 
 export function parseClaim(body: any): ClaimInput | { error: string } {
   const tier = typeof body?.tier === "string" ? body.tier : "";
@@ -29,25 +36,29 @@ export function parseClaim(body: any): ClaimInput | { error: string } {
   const logoUrl = cleanUrl(body?.logo_url);
   if (!TIER_LABEL[tier] || !ownerName || !websiteUrl) return { error: "Missing required fields." };
   if (websiteUrl === undefined || logoUrl === undefined) return { error: "Links must start with http:// or https://" };
-  return { tier, ownerName, websiteUrl, logoUrl };
+  const rawSlot = body?.slot;
+  const slot = rawSlot === undefined || rawSlot === null || rawSlot === "" ? null : Number(rawSlot);
+  if (slot !== null && !(Number.isInteger(slot) && slot >= 0 && slot < 10000)) return { error: "Unknown plot." };
+  return { tier, ownerName, websiteUrl, logoUrl, slot };
 }
 
-// Hold the next open plot in a tier until `minutes` from now.
-// Each attempt is one conditional UPDATE, so two buyers can never hold the same plot.
-export async function holdPlotInTier(tier: string, minutes: number) {
+// Hold a plot until `minutes` from now: the exact slot if one was chosen,
+// otherwise the next open plot in the tier. Each attempt is one conditional
+// UPDATE, so two buyers can never hold the same plot.
+export async function holdPlotInTier(tier: string, minutes: number, slot: number | null = null) {
   const supabase = supabaseAdmin();
   const now = new Date();
   const nowIso = now.toISOString();
   const holdUntil = new Date(now.getTime() + minutes * 60 * 1000).toISOString();
 
-  const { data: candidates } = await supabase
+  let query = supabase
     .from("plots")
     .select("id")
     .eq("tier", tier)
     .eq("status", "available")
-    .or(`reserved_until.is.null,reserved_until.lt.${nowIso}`)
-    .order("slot_index", { ascending: true })
-    .limit(5);
+    .or(`reserved_until.is.null,reserved_until.lt.${nowIso}`);
+  if (slot !== null) query = query.eq("slot_index", slot);
+  const { data: candidates } = await query.order("slot_index", { ascending: true }).limit(5);
 
   for (const c of candidates ?? []) {
     const { data } = await supabase

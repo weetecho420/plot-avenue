@@ -164,378 +164,6 @@ body::before {
   text-shadow: 0 0 14px rgba(77, 217, 255, 0.35);
 }
 
-/* ================================================================
-   City scene: flat, front-facing building row (see below)
-   ================================================================ */
-.scene {
-  position: relative;
-  margin: 20px 0 36px;
-}
-
-.scene-controls {
-  position: absolute;
-  right: 10px;
-  bottom: 10px;
-  z-index: 5;
-  display: flex;
-  gap: 6px;
-}
-
-.scene-controls button {
-  width: 34px;
-  height: 34px;
-  border-radius: 6px;
-  border: 1px solid rgba(77, 217, 255, 0.5);
-  background: #0d1117;
-  color: #dfeffa;
-  font-size: 16px;
-  font-weight: 700;
-  cursor: pointer;
-  box-shadow: 0 0 8px rgba(77, 217, 255, 0.35);
-}
-
-.scene-controls button:hover {
-  background: #141b24;
-}
-
-.scene-controls button.reset {
-  width: auto;
-  padding: 0 10px;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.3px;
-}
-
-.scene-viewport {
-  position: relative;
-  min-height: 380px;
-  overflow: hidden;
-  border-radius: 10px;
-  border: 1px solid rgba(77, 217, 255, 0.25);
-  background:
-    radial-gradient(ellipse at 50% 0%, rgba(77, 217, 255, 0.10), transparent 65%),
-    #0b0e13;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  padding-bottom: 32px;
-}
-
-/* Flat, front-facing "shop row" view: every building is a single flat card
-   sitting on a shared street, all bottom-aligned in one straight line. No
-   3D transforms, so there's no second face to read as a "double" building
-   and the row always stays perfectly straight regardless of camera math. */
-.stage {
-  position: relative;
-  transform-origin: 50% 100%;
-}
-
-.building-row {
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  gap: 20px;
-  text-decoration: none;
-}
-
-.building-col {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-decoration: none;
-}
-
-.tag {
-  margin-bottom: 10px;
-}
-
-.building {
-  position: relative;
-  border-radius: 5px 5px 0 0;
-  box-shadow:
-    inset -8px 0 14px rgba(0, 0, 0, 0.35),
-    inset 6px 0 10px rgba(255, 255, 255, 0.06),
-    inset 0 3px 0 rgba(255, 255, 255, 0.22),
-    0 10px 18px -6px rgba(0, 0, 0, 0.55);
-  background-image:
-    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.3) 0 3px, transparent 3px 12px),
-    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.3) 0 3px, transparent 3px 13px);
-}
-
-.building::after {
-  content: "";
-  position: absolute;
-  left: 8%;
-  right: 8%;
-  bottom: -8px;
-  height: 8px;
-  background: radial-gradient(ellipse, rgba(0, 0, 0, 0.5), transparent 70%);
-  z-index: -1;
-}
-
-.plot-logo {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  object-fit: cover;
-  background: #0d1117;
-  border: 2px solid rgba(77, 217, 255, 0.85);
-  box-shadow: 0 0 8px rgba(77, 217, 255, 0.6);
-  display: block;
-}
-
-.plot-sign,
-.plot-price {
-  display: inline-block;
-  white-space: nowrap;
-  font-size: 12px;
-  font-weight: 700;
-  padding: 4px 9px;
-  border-radius: 5px;
-  background: #0d1117;
-  color: #dfeffa;
-  border: 1px solid rgba(77, 217, 255, 0.5);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
-}
-
-.plot-price {
-  color: #f2c230;
-}
-
-/* ---- the street: a sidewalk (pedestrians) over a road (cars) ---- */
-.street {
-  position: relative;
-}
-
-.sidewalk {
-  position: relative;
-  height: 14px;
-  background: linear-gradient(180deg, #3a4048, #2a2e34);
-  border-top: 2px solid rgba(77, 217, 255, 0.18);
-}
-
-.road {
-  position: relative;
-  height: 26px;
-  background: linear-gradient(180deg, #22262c, #14171b);
-  border-top: 1px solid rgba(0, 0, 0, 0.4);
-}
-
-/* ---- a small car, built from a body/cabin/wheels/lights, not one box ---- */
-.car {
-  position: absolute;
-  width: 30px;
-  height: 16px;
-  animation-name: driveStreet;
-  animation-timing-function: ease-in-out;
-  animation-iteration-count: infinite;
-  animation-direction: alternate;
-}
-
-.car .body {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 3px;
-  height: 10px;
-  border-radius: 5px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
-}
-
-.car .cabin {
-  position: absolute;
-  left: 7px;
-  right: 7px;
-  bottom: 9px;
-  height: 7px;
-  border-radius: 5px 5px 2px 2px;
-}
-
-.car .cabin::after {
-  content: "";
-  position: absolute;
-  left: 1px;
-  right: 1px;
-  top: 1px;
-  height: 4px;
-  background: linear-gradient(180deg, rgba(190, 225, 245, 0.9), rgba(140, 190, 220, 0.6));
-  border-radius: 3px 3px 0 0;
-}
-
-.car .wheel {
-  position: absolute;
-  bottom: 0;
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: #1a1d22;
-  box-shadow: inset 0 0 0 1.5px #4a4f57;
-}
-
-.car .wheel.front {
-  left: 3px;
-}
-
-.car .wheel.back {
-  right: 3px;
-}
-
-.car .light {
-  position: absolute;
-  bottom: 5px;
-  width: 3px;
-  height: 3px;
-  border-radius: 50%;
-  background: #fff6c9;
-  box-shadow: 0 0 3px rgba(255, 246, 201, 0.9);
-}
-
-.car .light.front {
-  left: -1px;
-}
-
-.car .light.back {
-  right: -1px;
-  background: #ff5a4d;
-  box-shadow: 0 0 3px rgba(255, 90, 77, 0.8);
-}
-
-@keyframes driveStreet {
-  from { transform: translateX(0px); }
-  to { transform: translateX(var(--span)); }
-}
-
-/* ---- a small pedestrian: head, torso, swinging arms and legs ---- */
-.ped {
-  position: absolute;
-  bottom: 0;
-  width: 12px;
-  height: 22px;
-  animation-name: walkSide;
-  animation-timing-function: ease-in-out;
-  animation-iteration-count: infinite;
-  animation-direction: alternate;
-}
-
-@keyframes walkSide {
-  from { transform: translateX(0px); }
-  to { transform: translateX(var(--span)); }
-}
-
-.ped .head {
-  position: absolute;
-  top: 0;
-  left: 50%;
-  width: 7px;
-  height: 7px;
-  margin-left: -3.5px;
-  border-radius: 50%;
-  background: #e0a86a;
-}
-
-.ped .torso {
-  position: absolute;
-  top: 6px;
-  left: 50%;
-  width: 8px;
-  height: 9px;
-  margin-left: -4px;
-  border-radius: 3px 3px 2px 2px;
-  background: #3d8fd6;
-}
-
-.ped .arm {
-  position: absolute;
-  top: 7px;
-  width: 2.4px;
-  height: 7px;
-  border-radius: 2px;
-  background: #3d8fd6;
-  transform-origin: top center;
-}
-
-.ped .arm.l {
-  left: 1.5px;
-  animation: pedSwingA 0.6s ease-in-out infinite alternate;
-}
-
-.ped .arm.r {
-  right: 1.5px;
-  animation: pedSwingB 0.6s ease-in-out infinite alternate;
-}
-
-.ped .leg {
-  position: absolute;
-  top: 14px;
-  width: 3px;
-  height: 8px;
-  border-radius: 2px;
-  background: #2a2e34;
-  transform-origin: top center;
-}
-
-.ped .leg.l {
-  left: 3px;
-  animation: pedSwingB 0.6s ease-in-out infinite alternate;
-}
-
-.ped .leg.r {
-  right: 3px;
-  animation: pedSwingA 0.6s ease-in-out infinite alternate;
-}
-
-@keyframes pedSwingA {
-  from { transform: rotate(-22deg); }
-  to { transform: rotate(22deg); }
-}
-
-@keyframes pedSwingB {
-  from { transform: rotate(22deg); }
-  to { transform: rotate(-22deg); }
-}
-
-/* ---- a small plane towing a banner across the top of the scene ---- */
-.plane-rig {
-  position: absolute;
-  top: 14px;
-  left: -260px;
-  display: flex;
-  align-items: center;
-  z-index: 4;
-  pointer-events: none;
-  animation: flyAcrossScene 14s linear infinite;
-}
-
-.plane-rig .banner {
-  white-space: nowrap;
-  background: #f2c230;
-  color: #141821;
-  font: 700 10px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  letter-spacing: 0.4px;
-  padding: 2px 8px;
-  border-radius: 3px;
-  box-shadow: 0 0 8px rgba(242, 194, 48, 0.6);
-}
-
-.plane-rig .tow-line {
-  width: 16px;
-  height: 2px;
-  background: linear-gradient(90deg, rgba(223, 239, 250, 0.85), rgba(223, 239, 250, 0.35));
-}
-
-.plane-rig .plane-icon {
-  flex: none;
-  width: 30px;
-  height: 30px;
-  transform: rotate(90deg);
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.45));
-}
-
-@keyframes flyAcrossScene {
-  from { left: -260px; }
-  to { left: 110%; }
-}
-
 /* Crypto payment button: outlined so it sits under the main PayMongo button */
 form.claim button.crypto {
   background: transparent;
@@ -564,3 +192,331 @@ form.claim button.phantom:disabled { opacity: 0.6; cursor: wait; }
 .phantom-msg.error { color: #e0604f; }
 .nft-proof { margin: 12px 0 20px; }
 .nft-proof a { color: #ab9ff2; }
+
+/* ================================================================
+   The avenue at night. Dark buildings are for sale; every claimed plot
+   lights up with warm windows and a neon rooftop billboard.
+   ================================================================ */
+.av-scene {
+  --night: #0f1428;
+  --dusk: #2b1e3d;
+  --glass: #191f33;
+  --glass-lit: #22293f;
+  --glass-edge: #2a3350;
+  --window-off: #252d47;
+  --window-on: #ffd27a;
+  position: relative;
+  margin: 20px 0 12px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(181, 150, 255, 0.18);
+  background: linear-gradient(180deg, var(--night) 0%, #171a36 58%, var(--dusk) 100%);
+}
+
+.av-sky { position: absolute; inset: 0; pointer-events: none; }
+.av-moon {
+  position: absolute;
+  top: 24px;
+  left: 44px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 38% 38%, #fff6df, #e9dcc0 60%, #cbbd9f);
+  box-shadow: 0 0 40px 8px rgba(255, 240, 210, 0.14);
+}
+
+.av-scroller {
+  position: relative;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(181, 150, 255, 0.35) transparent;
+  -webkit-overflow-scrolling: touch;
+}
+
+.av-avenue {
+  position: relative;
+  width: max-content;
+  min-width: 100%;
+  padding-top: 48px;
+}
+
+/* faint far-away skyline behind the avenue, for depth */
+.av-backdrop {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 54px;
+  height: 210px;
+  opacity: 0.6;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg,
+      transparent 0 3%, #201e40 3% 7%, transparent 7% 8%, #201e40 8% 10%, transparent 10% 14%,
+      #201e40 14% 17%, transparent 17% 21%, #201e40 21% 25%, transparent 25% 29%,
+      #201e40 29% 30.5%, transparent 30.5% 35%, #201e40 35% 39%, transparent 39% 43%,
+      #201e40 43% 45%, transparent 45% 50%, #201e40 50% 54%, transparent 54% 58%,
+      #201e40 58% 60%, transparent 60% 65%, #201e40 65% 69%, transparent 69% 73%,
+      #201e40 73% 75%, transparent 75% 80%, #201e40 80% 84%, transparent 84% 89%,
+      #201e40 89% 91%, transparent 91% 95%, #201e40 95% 98%, transparent 98%) 0 0 / 820px 100% repeat-x,
+    linear-gradient(90deg,
+      transparent 0 10%, #1c1a39 10% 18%, transparent 18% 40%, #1c1a39 40% 46%,
+      transparent 46% 70%, #1c1a39 70% 79%, transparent 79%) 0 0 / 1300px 100% repeat-x;
+  -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 25%);
+  mask-image: linear-gradient(180deg, transparent 0%, #000 25%);
+}
+
+.av-row {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  padding: 0 28px;
+}
+
+/* ---- one building: [billboard or roof space] over [body] ---- */
+.av-building {
+  position: relative;
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: var(--w);
+  text-decoration: none;
+  color: inherit;
+  outline: none;
+}
+
+.av-body {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: var(--h);
+  border-radius: 3px 3px 0 0;
+  border: 1px solid var(--glass-edge);
+  border-bottom: none;
+  background-color: var(--glass);
+  /* layers, top first: floor bands, a few unlit windows, window columns */
+  background-image:
+    repeating-linear-gradient(180deg, transparent 0 8px, var(--glass) 8px 17px),
+    repeating-linear-gradient(90deg, transparent 0 32px, var(--glass) 32px 46px),
+    repeating-linear-gradient(90deg, transparent 0 4px, var(--window-off) 4px 11px, transparent 11px 15px);
+  background-position: 0 14px, var(--win-shift) 0, var(--win-shift) 14px;
+  background-repeat: repeat;
+  transition: filter 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* For-sale buildings get roof details; lit ones carry a billboard instead. */
+.av-roof-gap { display: block; height: 0; }
+.is-dark .av-body::before {
+  content: "";
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--glass-edge);
+}
+.is-dark .tier-shop::before { width: 78%; height: 6px; border-radius: 2px 2px 0 0; }
+.is-dark .tier-tower::before { width: 58%; height: 14px; border-radius: 2px 2px 0 0; }
+.is-dark .tier-skyscraper::before { width: 3px; height: 34px; }
+.is-dark .tier-skyscraper::after {
+  content: "";
+  position: absolute;
+  bottom: calc(100% + 32px);
+  left: 50%;
+  width: 6px;
+  height: 6px;
+  margin-left: -3px;
+  border-radius: 50%;
+  background: #ff4d5e;
+  box-shadow: 0 0 8px 2px rgba(255, 77, 94, 0.6);
+  animation: av-blink 2.4s steps(1) infinite;
+}
+
+/* price tag on a for-sale building, at street level like a shop sign */
+.av-price {
+  position: absolute;
+  left: 50%;
+  bottom: 8px;
+  transform: translateX(-50%);
+  padding: 2px 7px;
+  border-radius: 3px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--neon);
+  background: rgba(15, 20, 40, 0.92);
+  border: 1px solid color-mix(in srgb, var(--neon) 45%, transparent);
+  white-space: nowrap;
+}
+
+.is-dark:hover .av-body,
+.is-dark:focus-visible .av-body {
+  box-shadow: 0 0 0 1px var(--neon), 0 0 22px -4px var(--neon);
+  filter: brightness(1.25);
+}
+
+/* ---- claimed: the lights are on ---- */
+.is-lit .av-body {
+  --window-off: var(--window-on);
+  background-color: var(--glass-lit);
+  box-shadow: 0 0 28px -10px rgba(255, 210, 122, 0.55);
+}
+
+.av-billboard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: max(calc(var(--w) + 16px), 78px);
+  margin-bottom: 9px;
+  padding: 6px 6px 5px;
+  border-radius: 5px;
+  background: #0d1124;
+  border: 2px solid var(--neon);
+  box-shadow: 0 0 14px -2px var(--neon), inset 0 0 10px -4px var(--neon);
+}
+/* two thin posts holding the sign above the roof */
+.av-billboard::before,
+.av-billboard::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  width: 2px;
+  height: 9px;
+  background: var(--glass-edge);
+}
+.av-billboard::before { left: 28%; }
+.av-billboard::after { right: 28%; }
+
+.av-billboard img {
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  object-fit: cover;
+  background: #fff;
+}
+
+.av-billboard-name {
+  max-width: 100%;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  text-align: center;
+  overflow-wrap: anywhere;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: #f6f1ff;
+  text-shadow: 0 0 6px var(--neon);
+}
+
+/* warm light spilling onto the pavement */
+.is-lit .av-body::after {
+  content: "";
+  position: absolute;
+  left: -30%;
+  right: -30%;
+  bottom: -14px;
+  height: 18px;
+  background: radial-gradient(ellipse at 50% 0%, rgba(255, 210, 122, 0.35), transparent 70%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.is-lit:hover .av-body,
+.is-lit:focus-visible .av-body { filter: brightness(1.15); }
+
+.av-building:focus-visible { outline: 2px solid var(--neon); outline-offset: 4px; }
+
+/* ---- the street ---- */
+.av-street {
+  position: relative;
+  height: 54px;
+  border-top: 10px solid #2a2c46;
+  background:
+    linear-gradient(90deg, transparent 0 50%, rgba(255, 210, 122, 0.55) 50% 100%) 0 50% / 46px 2px repeat-x,
+    linear-gradient(180deg, #17192f, #0f1124);
+  overflow: hidden;
+}
+
+.av-car {
+  position: absolute;
+  width: 34px;
+  height: 5px;
+  border-radius: 3px;
+  filter: blur(0.5px);
+  animation: av-drive 16s linear infinite;
+}
+.av-car-east {
+  top: 10px;
+  background: linear-gradient(90deg, transparent, rgba(255, 244, 214, 0.95));
+  box-shadow: 14px 0 12px rgba(255, 244, 214, 0.35);
+}
+.av-car-west {
+  bottom: 9px;
+  background: linear-gradient(270deg, transparent, rgba(255, 77, 94, 0.9));
+  box-shadow: -10px 0 10px rgba(255, 77, 94, 0.3);
+  animation-name: av-drive-back;
+  animation-duration: 21s;
+}
+
+@keyframes av-drive { from { left: -60px; } to { left: 100%; } }
+@keyframes av-drive-back { from { left: 100%; } to { left: -60px; } }
+@keyframes av-blink { 0%, 60% { opacity: 1; } 61%, 100% { opacity: 0.25; } }
+
+/* ---- scroll buttons ---- */
+.av-nav {
+  position: absolute;
+  right: 12px;
+  top: 12px;
+  display: flex;
+  gap: 6px;
+}
+.av-nav button {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid rgba(181, 150, 255, 0.4);
+  background: rgba(15, 20, 40, 0.8);
+  color: #ece7de;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+}
+.av-nav button:hover { background: rgba(43, 30, 61, 0.95); }
+.av-nav button:focus-visible { outline: 2px solid #b596ff; outline-offset: 2px; }
+
+.av-legend {
+  font-size: 14px;
+  color: var(--muted);
+  margin: 0 0 22px;
+}
+.av-legend b { color: var(--window-on, #ffd27a); font-weight: 700; }
+
+@media (prefers-reduced-motion: reduce) {
+  .av-car, .is-dark .tier-skyscraper::after { animation: none; }
+  .av-car { display: none; }
+}
+
+/* claim page: the exact plot picked on the avenue */
+.chosen-plot {
+  border: 1px solid rgba(255, 210, 122, 0.45);
+  border-radius: 6px;
+  padding: 12px 14px;
+  background: rgba(255, 210, 122, 0.06);
+}
+.chosen-plot p { margin: 0 0 6px; font-size: 15px; color: #ece7de; }
+.chosen-plot b { color: #ffd27a; }
+form.claim button.link-button {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 400;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.slot-note { color: #ffd27a; font-size: 13px; }

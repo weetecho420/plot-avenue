@@ -39,8 +39,8 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Couldn't get the SOL price. Please try again." }, { status: 502 });
   }
 
-  const held = await holdPlotInTier(input.tier, SOLANA_HOLD_MINUTES);
-  if (!held) return NextResponse.json({ error: "No plots left in that tier right now." }, { status: 409 });
+  const held = await holdPlotInTier(input.tier, SOLANA_HOLD_MINUTES, input.slot);
+  if (!held) return NextResponse.json({ error: input.slot !== null ? "That plot was just taken. Pick another one on the avenue." : "No plots left in that tier right now." }, { status: 409 });
 
   const lamports = usdCentsToLamports(held.price_cents, price);
   const reference = newReference();

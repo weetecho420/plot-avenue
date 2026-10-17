@@ -11,9 +11,9 @@ export async function POST(req: Request) {
   const input = parseClaim(await req.json().catch(() => ({})));
   if ("error" in input) return NextResponse.json({ error: input.error }, { status: 400 });
 
-  const held = await holdPlotInTier(input.tier, HOLD_MINUTES);
+  const held = await holdPlotInTier(input.tier, HOLD_MINUTES, input.slot);
   if (!held) {
-    return NextResponse.json({ error: "No plots left in that tier right now." }, { status: 409 });
+    return NextResponse.json({ error: input.slot !== null ? "That plot was just taken. Pick another one on the avenue." : "No plots left in that tier right now." }, { status: 409 });
   }
 
   const supabase = supabaseAdmin();

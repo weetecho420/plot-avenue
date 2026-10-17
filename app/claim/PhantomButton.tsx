@@ -74,6 +74,7 @@ export default function PhantomButton({ getForm }: Props) {
       say("Reserving your plot…");
       const created = await post("/api/solana/create", {
         tier: f.get("tier"),
+        slot: f.get("slot"),
         owner_name: f.get("owner_name"),
         website_url: f.get("website_url"),
         logo_url: f.get("logo_url"),
