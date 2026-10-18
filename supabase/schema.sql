@@ -228,3 +228,40 @@ revoke execute on function complete_paypal_order(uuid, text, text) from public, 
 revoke execute on function complete_crypto_order(uuid, text, text, numeric) from public, anon, authenticated;
 revoke execute on function complete_solana_order(uuid, text) from public, anon, authenticated;
 revoke execute on function start_solana_nft_mint(uuid) from public, anon, authenticated;
+
+create table if not exists stripe_orders (
+  id uuid primary key default gen_random_uuid(),
+  plot_id uuid not null references plots(id),
+  owner_name text not null,
+  website_url text not null,
+  logo_url text,
+  price_cents int not null,                  -- USD cents, what Stripe charged
+  status text not null default 'pending',    -- pending | paid | expired | failed | needs_refund
+  checkout_session_id text,
+  payment_intent_id text,
+  customer_email text,
+  paid_at timestamptz,
+  created_at timestamptz not null default now()
+);
+alter table stripe_orders enable row level security;
+
+create or replace function complete_stripe_order(p_order_id uuid, p_session_id text, p_payment_intent text, p_email text)
+returns text language plpgsql security definer set search_path to 'public' as $$
+declare o stripe_orders%rowtype; claimed int;
+begin
+  select * into o from stripe_orders where id = p_order_id for update;
+  if not found then raise exception 'order not found'; end if;
+  if o.status = 'paid' then return 'ok'; end if;
+  update plots set status='claimed', owner_name=o.owner_name, website_url=o.website_url,
+         logo_url=o.logo_url, claimed_at=now(), reserved_until=null
+   where id=o.plot_id and status='available';
+  get diagnostics claimed = row_count;
+  if claimed = 0 then
+    update stripe_orders set status='needs_refund', checkout_session_id=coalesce(p_session_id, checkout_session_id), payment_intent_id=p_payment_intent, customer_email=p_email where id=o.id;
+    return 'plot_taken';
+  end if;
+  insert into sales_log (plot_id, owner_name, price_cents) values (o.plot_id, o.owner_name, o.price_cents);
+  update stripe_orders set status='paid', checkout_session_id=coalesce(p_session_id, checkout_session_id), payment_intent_id=p_payment_intent, customer_email=p_email, paid_at=now() where id=o.id;
+  return 'ok';
+end $$;
+revoke execute on function complete_stripe_order(uuid, text, text, text) from public, anon, authenticated;

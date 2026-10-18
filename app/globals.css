@@ -174,6 +174,16 @@ form.claim button.crypto:hover {
   background: rgba(245, 197, 66, 0.12);
 }
 
+/* Card (Stripe) button: Stripe purple, sits first */
+form.claim button.card-pay {
+  background: #635bff;
+  color: #fff;
+  border: 1px solid #635bff;
+}
+form.claim button.card-pay:hover {
+  background: #7a73ff;
+}
+
 /* PayPal button area (only shown when PayPal keys are set) */
 .paypal-box { margin-top: 4px; }
 .paypal-or { font-size: 12px; color: var(--muted); text-align: center; margin: 4px 0 8px; }

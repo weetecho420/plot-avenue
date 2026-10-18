@@ -58,6 +58,25 @@ in Vercel's Project Settings → Environment Variables. Deploy.
    `PAYMONGO_WEBHOOK_SECRET` to your live keys, and re-register the
    webhook endpoint in live mode.
 
+## 4b. Payments — Stripe (cards, Apple Pay, Google Pay)
+
+Charged in USD; Stripe converts and pays out to the NZ bank on the payout schedule.
+
+1. Stripe dashboard → Developers → API keys → copy the **secret key** into
+   Vercel as `STRIPE_SECRET_KEY` (sk_test_… for testing, sk_live_… for real money).
+2. Developers → Webhooks → Add endpoint:
+   `https://plot-avenue.vercel.app/api/stripe/webhook`, events
+   `checkout.session.completed`, `checkout.session.async_payment_succeeded`,
+   `checkout.session.expired`. Copy its signing secret (whsec_…) into
+   `STRIPE_WEBHOOK_SECRET`.
+3. Set `NEXT_PUBLIC_STRIPE_ENABLED=1` and redeploy. The "Pay with card" button appears.
+4. Test card: 4242 4242 4242 4242, any future date, any CVC.
+5. Going live: swap both values for the live-mode key and the live-mode
+   webhook's secret (test and live webhooks are separate), then redeploy.
+
+Orders land in `stripe_orders`. `needs_refund` = paid but the plot was taken
+(or the amount didn't match): refund it from the Stripe dashboard.
+
 ## 5. Editing the skyline
 - Add/remove plots by inserting rows into `plots` in Supabase directly,
   or build a small admin page later (same PIN-login pattern you used

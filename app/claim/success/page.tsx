@@ -15,6 +15,7 @@ export default function ClaimSuccessPage({
         Thanks — your building is being added to the avenue. It may take a
         few seconds to appear on the skyline while we confirm the payment.
       </p>
+      {searchParams.via === "card" && <p>Your card receipt is on its way to your email from Stripe.</p>}
       {searchParams.via === "solana" && (
         <div className="nft-proof">
           {nft ? (

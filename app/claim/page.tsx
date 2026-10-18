@@ -14,6 +14,9 @@ const TIER_NAME: Record<string, string> = {
 
 type Chosen = { slot: number; tier: string; price_cents: number };
 
+// Card button shows once Stripe is set up (NEXT_PUBLIC_STRIPE_ENABLED=1).
+const STRIPE_ON = process.env.NEXT_PUBLIC_STRIPE_ENABLED === "1";
+
 const TIER_PRICE_CENTS: Record<string, number> = { kiosk: 500, shop: 2500, tower: 7500, skyscraper: 15000 };
 
 export default function ClaimPage() {
@@ -58,9 +61,10 @@ export default function ClaimPage() {
     e.preventDefault();
     setStatus("submitting");
     const form = new FormData(e.currentTarget);
-    // Which button was pressed: PayMongo (GCash/card) or crypto.
+    // Which button was pressed: card (Stripe), GCash/QR Ph (PayMongo) or crypto.
     const submitter = (e.nativeEvent as SubmitEvent).submitter as HTMLButtonElement | null;
-    const endpoint = submitter?.value === "crypto" ? "/api/crypto-checkout" : "/api/claim";
+    const endpoint =
+      submitter?.value === "crypto" ? "/api/crypto-checkout" : submitter?.value === "card" ? "/api/stripe/checkout" : "/api/claim";
 
     const res = await fetch(endpoint, {
       method: "POST",
@@ -136,6 +140,11 @@ export default function ClaimPage() {
             Logo image URL
             <input name="logo_url" type="url" placeholder="https://" />
           </label>
+          {STRIPE_ON && (
+            <button type="submit" name="pay" value="card" className="card-pay" disabled={status === "submitting"}>
+              {status === "submitting" ? "Reserving..." : `Pay with card — ${usd} USD`}
+            </button>
+          )}
           <button type="submit" name="pay" value="paymongo" disabled={status === "submitting"}>
             {status === "submitting" ? "Reserving..." : `Pay with GCash / QR Ph — ${pesoLabel}`}
           </button>
