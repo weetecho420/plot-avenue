@@ -17,7 +17,11 @@ export default async function HomePage() {
     .limit(6);
 
   const claimed = (plots ?? []).filter((p) => p.status === "claimed");
-  const totalCents = claimed.reduce((sum, p) => sum + p.price_cents, 0);
+  // House plots are Plot Avenue's own projects, placed free: lit, but not sales.
+  const sold = claimed.filter((p) => !p.house);
+  const houseNames = new Set(claimed.filter((p) => p.house).map((p) => String(p.owner_name).toLowerCase()));
+  const totalCents = sold.reduce((sum, p) => sum + p.price_cents, 0);
+  const realSales = (sales ?? []).filter((s) => !houseNames.has(String(s.owner_name).toLowerCase()));
 
   return (
     <main className="wrap">
@@ -34,19 +38,19 @@ export default async function HomePage() {
 
       <CityScene plots={plots ?? []} />
       <p className="av-legend">
-        Every sale switches a building on. Tap a dark one to claim that exact spot, or a lit one to visit its owner.
+        Every sale switches a building on (the first few lit ones are our own projects). Tap a dark one to claim that exact spot, or a lit one to visit its owner.
       </p>
 
       <Link href="/claim" className="cta">Claim a plot from $5</Link>
 
       <div className="feed">
-        {(sales ?? []).map((s, i) => (
+        {realSales.map((s, i) => (
           <div className="feed-row" key={i}>
             <span className="name">{s.owner_name}</span>
             <span className="price">${(s.price_cents / 100).toFixed(0)}</span>
           </div>
         ))}
-        {(sales ?? []).length === 0 && (
+        {realSales.length === 0 && (
           <div className="feed-row"><span className="name">No sales yet — be the first.</span></div>
         )}
       </div>
