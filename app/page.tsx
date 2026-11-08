@@ -1,6 +1,7 @@
 import { supabasePublic } from "@/lib/supabase";
 import Link from "next/link";
 import CityScene from "./CityScene";
+import ParentStreet from "./ParentStreet";
 
 export const revalidate = 0;
 
@@ -15,6 +16,12 @@ export default async function HomePage() {
     .select("owner_name, price_cents, created_at")
     .order("created_at", { ascending: false })
     .limit(6);
+
+  const { data: streetProducts } = await supabasePublic
+    .from("street_products")
+    .select("id, title, blurb, price_cents, image_url")
+    .eq("street", "parent")
+    .order("sort", { ascending: true });
 
   const claimed = (plots ?? []).filter((p) => p.status === "claimed");
   // House plots are Plot Avenue's own projects, placed free: lit, but not sales.
@@ -42,6 +49,8 @@ export default async function HomePage() {
       </p>
 
       <Link href="/claim" className="cta">Claim a plot from $5</Link>
+
+      <ParentStreet products={streetProducts ?? []} />
 
       <div className="feed">
         {realSales.map((s, i) => (
