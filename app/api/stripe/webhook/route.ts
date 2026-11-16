@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
 import { releaseHold } from "@/lib/checkout";
 import { verifyStripeSignature } from "@/lib/stripe";
+import { completeTowerOrder } from "@/lib/tower-complete";
 
 // POST /api/stripe/webhook
 // Listen for: checkout.session.completed, checkout.session.async_payment_succeeded,
@@ -18,6 +19,25 @@ export async function POST(req: Request) {
   if (!/^[0-9a-f-]{36}$/i.test(orderId)) return NextResponse.json({ ok: true });
 
   const supabase = supabaseAdmin();
+
+  // Neon Tower takeovers have their own orders table.
+  if (session?.metadata?.kind === "tower") {
+    if (event.type === "checkout.session.expired") {
+      await supabase.from("tower_orders").update({ status: "expired" }).eq("id", orderId).eq("status", "pending");
+      return NextResponse.json({ ok: true });
+    }
+    const paid = event.type === "checkout.session.completed" || event.type === "checkout.session.async_payment_succeeded";
+    if (!paid || session?.payment_status !== "paid") return NextResponse.json({ ok: true });
+    const { data: t } = await supabase.from("tower_orders").select("price_cents").eq("id", orderId).maybeSingle();
+    const r = await completeTowerOrder(orderId, {
+      amountOk: !!t && session.currency === "usd" && Number(session.amount_total) === t.price_cents,
+      sessionId: session.id,
+      paymentRef: typeof session.payment_intent === "string" ? session.payment_intent : null,
+      email: session.customer_details?.email ?? null,
+    });
+    return r.ok ? NextResponse.json({ ok: true }) : NextResponse.json({ error: "Could not finalize takeover." }, { status: 500 });
+  }
+
   const { data: order } = await supabase
     .from("stripe_orders")
     .select("id, plot_id, price_cents, status")

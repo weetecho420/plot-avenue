@@ -2,6 +2,8 @@ import { supabasePublic } from "@/lib/supabase";
 import Link from "next/link";
 import CityScene from "./CityScene";
 import ParentStreet from "./ParentStreet";
+import NeonTower from "./NeonTower";
+import { getTower } from "@/lib/tower";
 
 export const revalidate = 0;
 
@@ -23,11 +25,13 @@ export default async function HomePage() {
     .eq("street", "parent")
     .order("sort", { ascending: true });
 
+  const tower = await getTower();
+
   const claimed = (plots ?? []).filter((p) => p.status === "claimed");
   // House plots are Plot Avenue's own projects, placed free: lit, but not sales.
   const sold = claimed.filter((p) => !p.house);
   const houseNames = new Set(claimed.filter((p) => p.house).map((p) => String(p.owner_name).toLowerCase()));
-  const totalCents = sold.reduce((sum, p) => sum + p.price_cents, 0);
+  const totalCents = sold.reduce((sum, p) => sum + p.price_cents, 0) + tower.history.reduce((sum, h) => sum + h.price_cents, 0);
   const realSales = (sales ?? []).filter((s) => !houseNames.has(String(s.owner_name).toLowerCase()));
 
   return (
@@ -42,6 +46,8 @@ export default async function HomePage() {
         <div><b>{(plots?.length ?? 0) - claimed.length}</b>still dark, for sale</div>
         <div><b>${(totalCents / 100).toLocaleString()}</b>total sales</div>
       </div>
+
+      <NeonTower state={tower.state} nextCents={tower.next_price_cents} />
 
       <CityScene plots={plots ?? []} />
       <p className="av-legend">

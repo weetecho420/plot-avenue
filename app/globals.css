@@ -601,3 +601,47 @@ form.claim button.link-button {
   .ps-card { transition: none; }
   .ps-card:hover { transform: none; }
 }
+
+/* ---- Neon Tower ---- */
+.muted { color: var(--muted); }
+.small { font-size: 13px; }
+.plainlink { text-decoration: none; }
+.nt { position: relative; margin: 0 0 22px; border-radius: 18px; padding: 16px; background: #0b0a14;
+  border: 2px solid #ff4fd8; box-shadow: 0 0 18px #ff4fd855, inset 0 0 24px #ff4fd822; }
+.nt-top { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.nt-top h2 { margin: 0; font-family: var(--font-display); font-size: 22px; color: #fff; text-shadow: 0 0 8px #ff4fd8, 0 0 18px #ff4fd8; letter-spacing: 0.5px; }
+.nt-live { width: 10px; height: 10px; border-radius: 50%; background: #39ff88; box-shadow: 0 0 10px #39ff88; animation: ntpulse 1.6s infinite; }
+@keyframes ntpulse { 50% { opacity: 0.35; } }
+@media (prefers-reduced-motion: reduce) { .nt-live { animation: none; } }
+.nt-count { margin-left: auto; font-size: 13px; color: var(--muted); }
+.nt-screen { margin: 14px 0; min-height: 150px; border-radius: 12px; display: grid; place-items: center; text-align: center; padding: 18px;
+  background: repeating-linear-gradient(0deg, #ffffff05 0 2px, transparent 2px 4px), radial-gradient(ellipse at center, #1c1235, #08060f 75%);
+  border: 1px solid #5be7f255; box-shadow: inset 0 0 30px #5be7f222; }
+.nt-ad { display: grid; justify-items: center; gap: 6px; text-decoration: none; color: #fff; }
+.nt-ad img { width: 72px; height: 72px; object-fit: contain; border-radius: 12px; background: #fff1; }
+.nt-name { font-size: 28px; font-weight: 800; color: #5be7f2; text-shadow: 0 0 10px #5be7f2, 0 0 22px #5be7f288; overflow-wrap: anywhere; }
+.nt-msg { font-size: 17px; color: #fff; max-width: 36ch; }
+.nt-paid { font-size: 12px; color: var(--muted); }
+.nt-empty { display: grid; gap: 6px; }
+.nt-empty b { font-size: 22px; color: #ffb547; text-shadow: 0 0 10px #ffb54788; }
+.nt-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; font-size: 15px; }
+.nt-foot b { color: #39ff88; font-size: 18px; }
+.nt-cta { background: #ff4fd8; color: #0b0a14; font-weight: 800; text-decoration: none; padding: 10px 18px; border-radius: 999px;
+  box-shadow: 0 0 14px #ff4fd888; min-height: 44px; display: inline-flex; align-items: center; }
+.nt-h2 { font-family: var(--font-display); font-size: 20px; margin: 28px 0 12px; }
+.nt-done { background: #0f2a1a; border: 1px solid #39ff88; padding: 12px 14px; border-radius: 12px; }
+.nt-hall { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+.nt-hall li { display: grid; grid-template-columns: auto 1fr auto; gap: 4px 10px; align-items: baseline; padding: 10px 12px;
+  border: 1px solid var(--line); border-radius: 12px; }
+.nt-hall li:first-child { border-color: #ff4fd8; }
+.nt-no { color: #ff4fd8; font-weight: 700; }
+.nt-hall a { font-weight: 700; overflow-wrap: anywhere; }
+.nt-hmsg { grid-column: 2 / 4; color: var(--muted); font-size: 14px; }
+.nt-hmeta { color: var(--muted); font-size: 13px; white-space: nowrap; }
+@media (max-width: 520px) { .nt-hall li { grid-template-columns: auto 1fr; } .nt-hmeta { grid-column: 2; } .nt-name { font-size: 24px; } }
+
+/* ---- plot pages ---- */
+.plotcard { display: grid; gap: 10px; justify-items: start; padding: 20px; border: 1px solid var(--line); border-radius: 16px; margin-bottom: 18px; }
+.plotcard h2 { margin: 0; font-family: var(--font-display); font-size: 26px; }
+.plotlogo { width: 84px; height: 84px; object-fit: contain; border-radius: 14px; background: #fff1; }
+.sharerow { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; font-size: 14px; }

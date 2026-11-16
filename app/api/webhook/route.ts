@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
 import crypto from "crypto";
+import { completeTowerOrder } from "@/lib/tower-complete";
 
 // POST /api/webhook  (PayMongo)
 // PayMongo sends: Paymongo-Signature: t=<timestamp>,te=<test-sig>,li=<live-sig>
@@ -48,8 +49,20 @@ export async function POST(req: Request) {
     .eq("id", orderId)
     .maybeSingle();
 
-  // Unknown order: say OK so PayMongo stops retrying, but do nothing.
-  if (!order) return NextResponse.json({ ok: true });
+  // Not a plot order? It may be a Neon Tower takeover.
+  if (!order) {
+    if (!/^[0-9a-f-]{36}$/i.test(orderId)) return NextResponse.json({ ok: true });
+    const { data: t } = await supabase.from("tower_orders").select("amount_php_centavos").eq("id", orderId).maybeSingle();
+    // Unknown order: say OK so PayMongo stops retrying, but do nothing.
+    if (!t) return NextResponse.json({ ok: true });
+    const r = await completeTowerOrder(orderId, {
+      amountOk: paidAmount === t.amount_php_centavos,
+      sessionId: session?.id ?? null,
+      paymentRef: paymentId,
+      email: payment?.attributes?.billing?.email ?? null,
+    });
+    return r.ok ? NextResponse.json({ ok: true }) : NextResponse.json({ error: "Could not finalize takeover." }, { status: 500 });
+  }
   if (order.status === "paid") return NextResponse.json({ ok: true });
 
   // Safety check: the amount paid must match what we charged.

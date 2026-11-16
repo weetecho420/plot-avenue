@@ -57,7 +57,7 @@ function Building({ p }: { p: Plot }) {
       <a
         href={p.website_url ?? "#"}
         target="_blank"
-        rel="noopener noreferrer"
+        rel="sponsored noopener"
         className="av-building is-lit"
         style={style}
         aria-label={`${p.owner_name} — plot ${p.slot_index + 1}, visit their site`}
